@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#8ed8f8" />
+    <meta name="description" content="一只鹈鹕，一辆单车，一段海岛骑行。 Three.js 3D 网页游戏。" />
+    <title>鹈鹕骑车 · Pelican Pedal Run</title>
+  </head>
+  <body>
+    <main id="app">
+      <div id="game-root" aria-label="鹈鹕骑车 3D 游戏画面"></div>
+      <div class="scene-shade" aria-hidden="true"></div>
+
+      <div id="loading" class="loading">
+        <div class="loading-mark"><span></span><span></span><span></span></div>
+        <p>正在搭建海岛赛道</p>
+      </div>
+
+      <header id="hud" class="hud hidden" aria-label="游戏状态">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <div><strong>鹈鹕骑车</strong><small>PELICAN PEDAL RUN</small></div>
+        </div>
+        <div class="hud-stats">
+          <div class="stat"><span>距离</span><strong id="distance">0 <small>m</small></strong></div>
+          <div class="stat fish-stat"><span>小鱼</span><strong id="fish">0</strong></div>
+          <div class="stat"><span>得分</span><strong id="score">0</strong></div>
+          <div class="stat health-stat"><span>体力</span><strong id="health">3 / 3</strong></div>
+        </div>
+        <div class="hud-actions">
+          <button id="camera-btn" class="icon-btn camera-btn" type="button" aria-label="切换到自由环视" aria-pressed="false" title="环视 / 后视（C）">环视</button>
+          <button id="sound-btn" class="icon-btn" type="button" aria-label="切换音效">音效 开</button>
+          <button id="pause-btn" class="icon-btn" type="button" aria-label="暂停游戏">暂停</button>
+        </div>
+      </header>
+
+      <section id="menu" class="overlay" aria-labelledby="game-title">
+        <div id="menu-card" class="menu-card">
+          <button id="menu-minimize-btn" class="menu-minimize-btn" type="button" aria-label="最小化开始菜单" aria-controls="menu-card" aria-expanded="true" title="收起菜单">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12" /></svg>
+          </button>
+          <div class="eyebrow"><span></span> ISLAND RIDE 01</div>
+          <h1 id="game-title">鹈鹕<span>骑车</span></h1>
+          <p class="lead">长嘴巴，小单车，还有一路海风。</p>
+          <p class="description">自动向前骑行，变道、跳跃或低头躲开障碍，沿途收集小鱼，在 600 米终点前保住体力。</p>
+          <p class="orbit-hint"><span></span>拖动画面 3D 环视 · 滚轮 / 双指缩放</p>
+          <div class="menu-meta">
+            <div><span>关卡</span><strong>珊瑚海岸</strong></div>
+            <div><span>最佳</span><strong id="best-score">0</strong></div>
+            <div><span>目标</span><strong>600 m</strong></div>
+          </div>
+          <button id="start-btn" class="primary-btn" type="button">出发，去兜风 <span>→</span></button>
+          <div class="control-hints" aria-label="操作说明">
+            <div><kbd>A</kbd><kbd>D</kbd><span>左右变道</span></div>
+            <div><kbd>W</kbd><kbd>↑</kbd><span>跳跃</span></div>
+            <div><kbd>S</kbd><kbd>↓</kbd><span>低头</span></div>
+            <div><kbd>P</kbd><span>暂停</span></div>
+          </div>
+          <p class="touch-hint">手机可拖动环视，使用屏幕按钮操作</p>
+        </div>
+        <button id="menu-expand-btn" class="menu-expand-btn hidden" type="button" aria-label="展开开始菜单" aria-controls="menu-card" aria-expanded="false" title="展开菜单">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M13 35c-4-3-6-9-4-15 2-7 8-11 15-10 6 1 10 5 10 11v8H13Z" fill="currentColor" />
+            <path d="M31 16 46 21 31 26Z" fill="#ffd166" />
+            <circle cx="28" cy="15" r="2.2" fill="#123047" />
+          </svg>
+          <span>菜单</span>
+        </button>
+      </section>
+
+      <section id="pause-panel" class="overlay compact hidden" aria-labelledby="pause-title">
+        <div class="panel-card">
+          <div class="eyebrow">TAKE A BREATH</div>
+          <h2 id="pause-title">歇一会儿</h2>
+          <p>海风会等你，赛道也会。</p>
+          <button id="resume-btn" class="primary-btn" type="button">继续骑行 <span>→</span></button>
+          <button id="restart-btn" class="secondary-btn" type="button">重新开始</button>
+        </div>
+      </section>
+
+      <section id="result-panel" class="overlay compact hidden" aria-labelledby="result-title">
+        <div class="panel-card result-card">
+          <div class="eyebrow" id="result-eyebrow">RUN COMPLETE</div>
+          <h2 id="result-title">漂亮的一程</h2>
+          <div id="result-stars" class="stars" aria-label="关卡评价"><span>★</span><span>★</span><span>★</span></div>
+          <div class="result-score"><span>本局得分</span><strong id="final-score">0</strong></div>
+          <div class="result-grid">
+            <div><span>骑行距离</span><strong id="final-distance">0 m</strong></div>
+            <div><span>收集小鱼</span><strong id="final-fish">0</strong></div>
+            <div><span>剩余体力</span><strong id="final-health">0 / 3</strong></div>
+          </div>
+          <p id="result-note" class="result-note"></p>
+          <button id="again-btn" class="primary-btn" type="button">再骑一次 <span>→</span></button>
+          <button id="home-btn" class="secondary-btn" type="button">返回首页</button>
+        </div>
+      </section>
+
+      <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+      <div id="mobile-controls" class="mobile-controls hidden" aria-label="触屏操作">
+        <div class="mobile-group">
+          <button data-action="left" type="button" aria-label="向左变道">←</button>
+          <button data-action="right" type="button" aria-label="向右变道">→</button>
+        </div>
+        <div class="mobile-group">
+          <button data-action="duck" type="button" aria-label="低头">低头</button>
+          <button data-action="jump" class="jump-btn" type="button" aria-label="跳跃">跳跃</button>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
